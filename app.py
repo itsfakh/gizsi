@@ -108,12 +108,11 @@ button[data-baseweb="tab"] {
    PEMBETULAN CSS UNTUK KOTAK AMARAN (ALERT) 
    ========================================= */
 
-/* Memaksa semua teks di dalam kotak peringatan/error menjadi hitam */
-[data-testid="stAlert"] p, 
-[data-testid="stAlert"] span, 
-[data-testid="stAlert"] div {
-    color: #111827 !important;
-    font-weight: 500 !important;
+/* Memaksa HANYA tulisan di dalam kotak peringatan (Warning/Error) menjadi hitam pekat */
+div[data-testid="stAlert"],
+div[data-testid="stAlert"] * {
+    color: #000000 !important;
+    font-weight: bold !important;
 }
 
 </style>
