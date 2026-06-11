@@ -360,3 +360,17 @@ if st.session_state.hasil_gizi:
         """,
         unsafe_allow_html=True
     )
+
+# ==================================
+# FOOTER
+# ==================================
+
+st.markdown("""
+<br><br>
+
+<center>
+<p style="color:gray;">
+CekGizi AI • Powered by Gemini AI
+</p>
+</center>
+""", unsafe_allow_html=True)
