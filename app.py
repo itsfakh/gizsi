@@ -115,6 +115,15 @@ button[data-baseweb="tab"] {
     color: #111827 !important;
     font-weight: 600 !important;
 }
+
+/* Memaksa semua teks di dalam kotak peringatan/error menjadi hitam */
+[data-testid="stAlert"] p, 
+[data-testid="stAlert"] span, 
+[data-testid="stAlert"] div {
+    color: #111827 !important;
+    font-weight: 500 !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
