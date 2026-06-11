@@ -90,7 +90,7 @@ st.markdown("""
 [data-testid="stMetricLabel"] {
     color: #374151 !important;
 }
-/* Semua teks Streamlit */
+/* Semua teks lalai Streamlit */
 label, p, span, small, div {
     color: #111827 !important;
 }
@@ -103,8 +103,17 @@ button[data-baseweb="tab"] {
     color: #111827 !important;
     font-weight: 600 !important;
 }
-[data-testid="stAlert"], [data-testid="stFileUploader"] *, [data-testid="stCameraInput"] * {
+
+/* =========================================
+   PEMBETULAN CSS UNTUK KOTAK AMARAN (ALERT) 
+   ========================================= */
+[data-testid="stAlert"] {
+    background-color: rgba(255, 255, 255, 0.6) !important;
+    border: 1px solid #e5e7eb !important;
+}
+[data-testid="stAlert"] * {
     color: #111827 !important;
+    font-weight: 600 !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -119,9 +128,9 @@ st.markdown("""
 </div>
 <div class="card">
     <h3>✨ Cara Menggunakan</h3>
-    1️⃣ Upload foto makanan atau gunakan kamera<br>
-    2️⃣ Klik tombol Analisis Nutrisi<br>
-    3️⃣ AI akan memperkirakan: Nama makanan, Kalori, Protein, Karbohidrat, Lemak, dan Tips kesehatan.
+    1️⃣ Muat naik foto makanan atau gunakan kamera<br>
+    2️⃣ Klik butang Analisis Nutrisi<br>
+    3️⃣ AI akan menganggarkan: Nama makanan, Kalori, Protein, Karbohidrat, Lemak, dan Tips kesihatan.
 </div>
 """, unsafe_allow_html=True)
 
@@ -131,7 +140,7 @@ st.markdown("""
 try:
     api_key = st.secrets["GEMINI_API_KEY"]
 except Exception:
-    st.error("⚠️ GEMINI_API_KEY tidak ditemukan di Streamlit Secrets.")
+    st.error("⚠️ GEMINI_API_KEY tidak ditemui di Streamlit Secrets.")
     st.stop()
 
 client = genai.Client(api_key=api_key)
@@ -150,20 +159,20 @@ left_col, right_col = st.columns([1, 1])
 with left_col:
     st.markdown("""
     <div class="card">
-        <h3>📷 Upload Foto Makanan</h3>
-        Gunakan kamera atau unggah dari galeri.
+        <h3>📷 Muat Naik Foto Makanan</h3>
+        Gunakan kamera atau muat naik dari galeri.
     </div>
     """, unsafe_allow_html=True)
     
     camera_image = st.camera_input("Ambil Foto")
-    uploaded_file = st.file_uploader("Atau Upload Foto", type=["jpg", "jpeg", "png"])
+    uploaded_file = st.file_uploader("Atau Muat Naik Foto", type=["jpg", "jpeg", "png"])
 
 image_file = camera_image if camera_image else uploaded_file
 
 with right_col:
     st.markdown("""
     <div class="card">
-        <h3>🖼️ Preview Gambar</h3>
+        <h3>🖼️ Pratonton Gambar</h3>
     </div>
     """, unsafe_allow_html=True)
     
@@ -171,17 +180,17 @@ with right_col:
         preview_image = Image.open(image_file)
         st.image(preview_image, use_container_width=True)
     else:
-        st.info("Upload foto makanan untuk melihat preview.")
+        st.info("Muat naik foto makanan untuk melihat pratonton.")
 
 # ==================================
 # ANALISIS
 # ==================================
 st.markdown("<br>", unsafe_allow_html=True)
 
-if image_file:
-    analyze = st.button("🔍 Analisis Nutrisi")
-    
-    if analyze:
+analyze = st.button("🔍 Analisis Nutrisi")
+
+if analyze:
+    if image_file:
         with st.spinner("🤖 AI sedang menganalisis makanan..."):
             
             # Kompresi gambar agar hemat kuota
@@ -189,7 +198,7 @@ if image_file:
             proses_image.thumbnail((800, 800))
             
             prompt = """
-            Anda adalah ahli gizi profesional.
+            Anda adalah pakar pemakanan profesional.
             Lihat gambar makanan yang diberikan.
             Balas HANYA dalam format JSON berikut:
             {
@@ -215,14 +224,18 @@ if image_file:
                 
                 # Simpan ke ingatan
                 st.session_state.hasil_gizi = data
-                st.success("Analisis berhasil!")
+                st.success("Analisis berjaya!")
                 
             except Exception as e:
                 error_text = str(e)
                 if "429" in error_text:
-                    st.warning("⚠️ Kuota Gemini sedang habis. Silakan tunggu beberapa saat.")
+                    st.warning("⚠️ Kuota sedang berehat. Sila tunggu 1 minit dan cuba lagi.")
+                elif "503" in error_text:
+                    st.warning("⏳ Pelayan (Server) AI sedang sesak. Sila tunggu beberapa saat dan klik Analisis lagi!")
                 else:
                     st.error(f"Gagal menganalisis gambar: {e}")
+    else:
+        st.warning("⚠️ Sila muat naik atau ambil foto makanan terlebih dahulu!")
 
 # ==================================
 # TAMPILAN HASIL
@@ -252,7 +265,7 @@ if st.session_state.hasil_gizi:
     st.markdown(
         f"""
         <div class="card">
-            <h3>💡 Tips Kesehatan</h3>
+            <h3>💡 Tips Kesihatan</h3>
             <p>{data.get('tips', '-')}</p>
         </div>
         """, unsafe_allow_html=True
@@ -264,6 +277,6 @@ if st.session_state.hasil_gizi:
 st.markdown("""
 <br><br>
 <center>
-    <p style="color:gray;">CekGizi AI • Powered by Gemini AI</p>
+    <p style="color:gray;">CekGizi AI • Dikuasakan oleh Gemini AI</p>
 </center>
 """, unsafe_allow_html=True)
