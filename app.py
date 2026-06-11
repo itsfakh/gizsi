@@ -107,10 +107,6 @@ button[data-baseweb="tab"] {
 /* =========================================
    PEMBETULAN CSS UNTUK KOTAK AMARAN (ALERT) 
    ========================================= */
-[data-testid="stAlert"] {
-    background-color: rgba(255, 255, 255, 0.6) !important;
-    border: 1px solid #e5e7eb !important;
-}
 
 /* Memaksa semua teks di dalam kotak peringatan/error menjadi hitam */
 [data-testid="stAlert"] p, 
