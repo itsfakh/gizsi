@@ -229,13 +229,13 @@ if analyze:
             except Exception as e:
                 error_text = str(e)
                 if "429" in error_text:
-                    st.warning("⚠️ Kuota sedang berehat. Sila tunggu 1 minit dan cuba lagi.")
+                    st.warning("⚠️ Kuota sedang istirahat. Mohon tunggu 1 minit dan coba lagi.")
                 elif "503" in error_text:
-                    st.warning("⏳ Pelayan (Server) AI sedang sesak. Sila tunggu beberapa saat dan klik Analisis lagi!")
+                    st.warning("⏳ Pelayan (Server) AI sedang sibuk. Silahkan tunggu beberapa saat dan klik Analisis lagi!")
                 else:
                     st.error(f"Gagal menganalisis gambar: {e}")
     else:
-        st.warning("⚠️ Sila muat naik atau ambil foto makanan terlebih dahulu!")
+        st.warning("⚠️ Silahkan apload atau ambil foto makanan terlebih dahulu!")
 
 # ==================================
 # TAMPILAN HASIL
