@@ -6,7 +6,6 @@ from google import genai
 # ==================================
 # PAGE CONFIG
 # ==================================
-
 st.set_page_config(
     page_title="CekGizi AI",
     page_icon="🥗",
@@ -16,26 +15,15 @@ st.set_page_config(
 # ==================================
 # CUSTOM CSS
 # ==================================
-
 st.markdown("""
 <style>
-
 /* Background */
 .stApp {
-    background: linear-gradient(
-        135deg,
-        #f0fdf4,
-        #ecfeff
-    );
+    background: linear-gradient(135deg, #f0fdf4, #ecfeff);
 }
-
 /* Hero Section */
 .hero {
-    background: linear-gradient(
-        90deg,
-        #10b981,
-        #22c55e
-    );
+    background: linear-gradient(90deg, #10b981, #22c55e);
     padding: 30px;
     border-radius: 25px;
     text-align: center;
@@ -43,7 +31,6 @@ st.markdown("""
     margin-bottom: 25px;
     box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
 }
-
 /* Cards */
 .card {
     background: white;
@@ -53,7 +40,6 @@ st.markdown("""
     box-shadow: 0px 4px 20px rgba(0,0,0,0.08);
     margin-bottom: 20px;
 }
-
 /* Metrics */
 [data-testid="metric-container"] {
     background: white !important;
@@ -62,23 +48,17 @@ st.markdown("""
     box-shadow: 0px 4px 15px rgba(0,0,0,0.08);
     border: 1px solid #e5e7eb;
 }
-/* Label metric */
 [data-testid="metric-container"] label {
     color: #374151 !important;
     font-weight: 600 !important;
 }
-
-/* Nilai metric */
 [data-testid="stMetricValue"] {
     color: #111827 !important;
     font-weight: 700 !important;
 }
-
-/* Delta metric (jika ada) */
 [data-testid="stMetricDelta"] {
     color: #10b981 !important;
 }
-
 /* Button */
 .stButton > button {
     width: 100%;
@@ -90,20 +70,16 @@ st.markdown("""
     font-size: 18px;
     font-weight: bold;
 }
-
 .stButton > button:hover {
     background: #059669;
     color: white;
 }
-
 /* Upload */
 [data-testid="stFileUploader"] {
     background: white;
     border-radius: 15px;
     padding: 10px;
 }
-
-/* Success */
 .stSuccess {
     border-radius: 15px;
 }
@@ -111,266 +87,183 @@ st.markdown("""
 [data-testid="metric-container"] * {
     color: #111827 !important;
 }
-
-[data-testid="stMetricValue"] {
-    color: #111827 !important;
-    font-weight: 700 !important;
-}
-
 [data-testid="stMetricLabel"] {
     color: #374151 !important;
 }
 /* Semua teks Streamlit */
-label,
-p,
-span,
-small,
-div {
+label, p, span, small, div {
     color: #111827 !important;
 }
-
-/* Label kamera */
-[data-testid="stCameraInput"] label {
+/* Label kamera & uploader */
+[data-testid="stCameraInput"] label, [data-testid="stFileUploader"] label {
     color: #111827 !important;
     font-weight: 600 !important;
 }
-
-/* Label file uploader */
-[data-testid="stFileUploader"] label {
-    color: #111827 !important;
-    font-weight: 600 !important;
-}
-
-/* Tab Kamera dan Upload */
 button[data-baseweb="tab"] {
     color: #111827 !important;
     font-weight: 600 !important;
 }
-
-/* Info box */
-[data-testid="stAlert"] {
+[data-testid="stAlert"], [data-testid="stFileUploader"] *, [data-testid="stCameraInput"] * {
     color: #111827 !important;
 }
-
-/* Teks di dalam uploader */
-[data-testid="stFileUploader"] * {
-    color: #111827 !important;
-}
-
-/* Teks kamera */
-[data-testid="stCameraInput"] * {
-    color: #111827 !important;
-}
-
 </style>
 """, unsafe_allow_html=True)
 
 # ==================================
-# HEADER
+# HEADER & DESKRIPSI
 # ==================================
-
 st.markdown("""
 <div class="hero">
     <h1>🥗 CekGizi AI</h1>
-    <p style="font-size:18px;">
-        Deteksi Kalori & Nutrisi Makanan dengan AI
-    </p>
+    <p style="font-size:18px;">Deteksi Kalori & Nutrisi Makanan dengan AI</p>
 </div>
-""", unsafe_allow_html=True)
-
-# ==================================
-# DESKRIPSI
-# ==================================
-
-st.markdown("""
 <div class="card">
-<h3>✨ Cara Menggunakan</h3>
-
-1️⃣ Upload foto makanan atau gunakan kamera
-
-2️⃣ Klik tombol Analisis Nutrisi
-
-3️⃣ AI akan memperkirakan:
-
-- Nama makanan
-- Kalori
-- Protein
-- Karbohidrat
-- Lemak
-- Tips kesehatan
-
+    <h3>✨ Cara Menggunakan</h3>
+    1️⃣ Upload foto makanan atau gunakan kamera<br>
+    2️⃣ Klik tombol Analisis Nutrisi<br>
+    3️⃣ AI akan memperkirakan: Nama makanan, Kalori, Protein, Karbohidrat, Lemak, dan Tips kesehatan.
 </div>
 """, unsafe_allow_html=True)
 
 # ==================================
-# API KEY
+# API KEY & INISIALISASI
 # ==================================
-
 try:
     api_key = st.secrets["GEMINI_API_KEY"]
 except Exception:
-    st.error("GEMINI_API_KEY tidak ditemukan.")
+    st.error("⚠️ GEMINI_API_KEY tidak ditemukan di Streamlit Secrets.")
     st.stop()
 
 client = genai.Client(api_key=api_key)
 
 # ==================================
-# INPUT FOTO
+# INGATAN APLIKASI (MENCEGAH BOROS API)
 # ==================================
+if "hasil_gizi" not in st.session_state:
+    st.session_state.hasil_gizi = None
 
+# ==================================
+# INPUT FOTO & PREVIEW
+# ==================================
 left_col, right_col = st.columns([1, 1])
 
 with left_col:
-
     st.markdown("""
     <div class="card">
         <h3>📷 Upload Foto Makanan</h3>
         Gunakan kamera atau unggah dari galeri.
     </div>
     """, unsafe_allow_html=True)
-
-    camera_image = st.camera_input(
-        "Ambil Foto"
-    )
-
-    uploaded_file = st.file_uploader(
-        "Atau Upload Foto",
-        type=["jpg", "jpeg", "png"]
-    )
+    
+    camera_image = st.camera_input("Ambil Foto")
+    uploaded_file = st.file_uploader("Atau Upload Foto", type=["jpg", "jpeg", "png"])
 
 image_file = camera_image if camera_image else uploaded_file
 
 with right_col:
-
     st.markdown("""
     <div class="card">
         <h3>🖼️ Preview Gambar</h3>
     </div>
     """, unsafe_allow_html=True)
-
+    
     if image_file:
-
-        image = Image.open(image_file)
-
-        st.image(
-            image,
-            use_container_width=True
-        )
-
+        preview_image = Image.open(image_file)
+        st.image(preview_image, use_container_width=True)
     else:
-
-        st.info(
-            "Upload foto makanan untuk melihat preview."
-        )
+        st.info("Upload foto makanan untuk melihat preview.")
 
 # ==================================
-# ANALISIS & MENCEGAH BOROS API
+# ANALISIS
 # ==================================
-
-# 1. MEMBUAT "INGATAN" APLIKASI
-# Agar hasil tidak hilang saat layar ter-refresh, kita simpan di session_state
-if "hasil_gizi" not in st.session_state:
-    st.session_state.hasil_gizi = None
-
-if image_file:
-    image = Image.open(image_file)
-    # 2. MENGECILKAN UKURAN GAMBAR
-    # Mengompres gambar menjadi maksimal 800x800 piksel agar API tidak berat dan cepat merespons
-    image.thumbnail((800, 800))
-
 st.markdown("<br>", unsafe_allow_html=True)
 
-analyze = st.button("🔍 Analisis Nutrisi")
-
-if analyze:
-    with st.spinner("🤖 AI sedang menerawang makanan ini..."):
-        prompt = """
-        Anda adalah ahli gizi profesional.
-        Lihat gambar makanan yang diberikan.
-        Balas HANYA dalam format JSON berikut:
-        {
-        "nama_makanan":"",
-        "kalori_kcal":"",
-        "protein_g":"",
-        "karbohidrat_g":"",
-        "lemak_g":"",
-        "tips":""
-        }
-        Jangan gunakan markdown. Jangan gunakan penjelasan tambahan.
-        """
-
-        try:
-            # 3. MENGGUNAKAN NAMA MODEL YANG BENAR
-            response = client.models.generate_content(
-                model="gemini-2.0-flash",
-                contents=[prompt, image]
-            )
-
-            result_text = response.text
-            result_text = result_text.replace("```json", "").replace("```", "").strip()
-            data = json.loads(result_text)
-
-            # 4. MENYIMPAN HASIL KE DALAM INGATAN
-            st.session_state.hasil_gizi = data
-            st.success("Analisis berhasil!")
-
-        except Exception as e:
-            error_text = str(e)
-            if "429" in error_text:
-                st.warning("⚠️ Kuota Gemini sedang istirahat. Silakan tunggu 1 menit lalu coba lagi.")
-            else:
-                st.error(f"Gagal menganalisis gambar: {e}")
+if image_file:
+    analyze = st.button("🔍 Analisis Nutrisi")
+    
+    if analyze:
+        with st.spinner("🤖 AI sedang menganalisis makanan..."):
+            
+            # Kompresi gambar agar hemat kuota
+            proses_image = Image.open(image_file)
+            proses_image.thumbnail((800, 800))
+            
+            prompt = """
+            Anda adalah ahli gizi profesional.
+            Lihat gambar makanan yang diberikan.
+            Balas HANYA dalam format JSON berikut:
+            {
+            "nama_makanan":"",
+            "kalori_kcal":"",
+            "protein_g":"",
+            "karbohidrat_g":"",
+            "lemak_g":"",
+            "tips":""
+            }
+            Jangan gunakan markdown. Jangan gunakan penjelasan tambahan.
+            """
+            
+            try:
+                response = client.models.generate_content(
+                    model="gemini-2.0-flash",
+                    contents=[prompt, proses_image]
+                )
+                
+                result_text = response.text
+                result_text = result_text.replace("```json", "").replace("```", "").strip()
+                data = json.loads(result_text)
+                
+                # Simpan ke ingatan
+                st.session_state.hasil_gizi = data
+                st.success("Analisis berhasil!")
+                
+            except Exception as e:
+                error_text = str(e)
+                if "429" in error_text:
+                    st.warning("⚠️ Kuota Gemini sedang habis. Silakan tunggu beberapa saat.")
+                else:
+                    st.error(f"Gagal menganalisis gambar: {e}")
 
 # ==================================
-# TAMPILAN HASIL (MEMBACA DARI INGATAN)
+# TAMPILAN HASIL
 # ==================================
-
-# Jika ada data di dalam ingatan, tampilkan hasilnya
 if st.session_state.hasil_gizi:
     data = st.session_state.hasil_gizi
-
+    
     st.markdown(
         f"""
         <div class="card">
-            <h2>🍽️ {data['nama_makanan']}</h2>
+            <h2>🍽️ {data.get('nama_makanan', 'Tidak diketahui')}</h2>
         </div>
-        """,
-        unsafe_allow_html=True
+        """, unsafe_allow_html=True
     )
-
+    
     col1, col2, col3, col4 = st.columns(4)
-
     with col1:
-        st.metric("🔥 Kalori", f"{data['kalori_kcal']} kcal")
+        st.metric("🔥 Kalori", f"{data.get('kalori_kcal', 0)} kcal")
     with col2:
-        st.metric("💪 Protein", f"{data['protein_g']} g")
+        st.metric("💪 Protein", f"{data.get('protein_g', 0)} g")
     with col3:
-        st.metric("🍚 Karbohidrat", f"{data['karbohidrat_g']} g")
+        st.metric("🍚 Karbo", f"{data.get('karbohidrat_g', 0)} g")
     with col4:
-        st.metric("🥑 Lemak", f"{data['lemak_g']} g")
-
+        st.metric("🥑 Lemak", f"{data.get('lemak_g', 0)} g")
+        
     st.markdown("<br>", unsafe_allow_html=True)
-
     st.markdown(
         f"""
         <div class="card">
             <h3>💡 Tips Kesehatan</h3>
-            <p>{data['tips']}</p>
+            <p>{data.get('tips', '-')}</p>
         </div>
-        """,
-        unsafe_allow_html=True
+        """, unsafe_allow_html=True
     )
 
 # ==================================
 # FOOTER
 # ==================================
-
 st.markdown("""
 <br><br>
-
 <center>
-<p style="color:gray;">
-CekGizi AI • Powered by Gemini AI
-</p>
+    <p style="color:gray;">CekGizi AI • Powered by Gemini AI</p>
 </center>
 """, unsafe_allow_html=True)
